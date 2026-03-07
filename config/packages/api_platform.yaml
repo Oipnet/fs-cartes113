@@ -1,0 +1,18 @@
+api_platform:
+    title: API fs-cartes113.forelse.info
+    version: 1.0.0
+    # Mercure integration, remove if unwanted
+    mercure: ~
+    resource_class_directories:
+        - '%kernel.project_dir%/src/Dto'
+    formats:
+        html: ['text/html']
+        jsonld: ['application/ld+json']
+        json: ['application/json']
+    # Good cache defaults for REST APIs
+    defaults:
+        stateless: true
+        cache_headers:
+            vary: ['Content-Type', 'Authorization', 'Origin']
+        extra_properties:
+            standard_put: true

@@ -1,0 +1,21 @@
+knp_gaufrette:
+    adapters:
+        cartes:
+            local:
+                directory: '%kernel.project_dir%/var/data/cartes'
+        fleurderoc:
+            local:
+                directory: '%kernel.project_dir%/var/data/cartes'
+        livres:
+            local:
+                directory: '%kernel.project_dir%/var/data/livres'
+    filesystems:
+        cartes_file_storage:
+            adapter: cartes
+            alias: file_storage_fs_cartes
+        fleurderoc_file_storage:
+            adapter: fleurderoc
+            alias: file_storage_fs_fleurderoc
+        livres_file_storage:
+            adapter: livres
+            alias: file_storage_fs_livres

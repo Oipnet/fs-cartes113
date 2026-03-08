@@ -17,7 +17,6 @@ data:
   MERCURE_PUBLIC_URL: "https://fs-cartes113.forelse.info/.well-known/mercure"
   MERCURE_PUBLISHER_JWT_ALG: "HS256"
   MERCURE_SUBSCRIBER_JWT_ALG: "HS256"
-  MERCURE_TRANSPORT_URL: "bolt:///data/mercure.db"
   MERCURE_EXTRA_DIRECTIVES: ""
 
   # Caddy

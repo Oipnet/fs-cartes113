@@ -1,0 +1,102 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app
+  namespace: cartes113
+spec:
+  # replicas: 1 obligatoire — Mercure utilise bolt (fichier), non partageable entre pods
+  replicas: 1
+  selector:
+    matchLabels:
+      app: app
+  template:
+    metadata:
+      labels:
+        app: app
+    spec:
+      imagePullSecrets:
+        - name: ghcr-secret
+
+      containers:
+        # ── Container PHP-FPM ──────────────────────────────────────────────────
+        - name: php
+          image: ghcr.io/<GITHUB_USERNAME>/fs-cartes113-php:latest
+          envFrom:
+            - secretRef:
+                name: app-secret
+            - configMapRef:
+                name: app-config
+          volumeMounts:
+            - name: php-socket
+              mountPath: /var/run/php
+          resources:
+            requests:
+              cpu: 200m
+              memory: 256Mi
+            limits:
+              cpu: 1000m
+              memory: 512Mi
+          # Le healthcheck utilise cgi-fcgi pour pinguer PHP-FPM via le socket Unix
+          livenessProbe:
+            exec:
+              command: ["docker-healthcheck"]
+            initialDelaySeconds: 30
+            periodSeconds: 15
+            timeoutSeconds: 3
+            failureThreshold: 3
+          readinessProbe:
+            exec:
+              command: ["docker-healthcheck"]
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
+
+        # ── Container Caddy (avec Mercure + Vulcain) ───────────────────────────
+        - name: caddy
+          image: ghcr.io/<GITHUB_USERNAME>/fs-cartes113-caddy:latest
+          envFrom:
+            - secretRef:
+                name: app-secret
+            - configMapRef:
+                name: app-config
+          ports:
+            - containerPort: 80
+              name: http
+          volumeMounts:
+            - name: php-socket
+              mountPath: /var/run/php
+            # Mercure bolt DB + données Caddy (TLS auto-géré si activé)
+            - name: mercure-data
+              mountPath: /data
+            - name: caddy-config
+              mountPath: /config
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi
+          readinessProbe:
+            tcpSocket:
+              port: 80
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          livenessProbe:
+            tcpSocket:
+              port: 80
+            initialDelaySeconds: 20
+            periodSeconds: 15
+
+      volumes:
+        # Socket Unix partagé entre PHP-FPM et Caddy
+        - name: php-socket
+          emptyDir: {}
+        # Données persistantes Mercure (bolt DB)
+        - name: mercure-data
+          persistentVolumeClaim:
+            claimName: mercure-data
+        # Config Caddy (non persistant, recréé au démarrage)
+        - name: caddy-config
+          emptyDir: {}

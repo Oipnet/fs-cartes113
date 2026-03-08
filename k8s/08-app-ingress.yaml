@@ -1,0 +1,39 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: app
+  namespace: cartes113
+  labels:
+    app.kubernetes.io/name: fs-cartes113
+    app.kubernetes.io/part-of: homelab
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.tls: "true"
+    traefik.ingress.kubernetes.io/router.tls.certresolver: letsencrypt
+
+    # --- Intégration Homepage (auto-discovery) ---
+    gethomepage.dev/enabled: "true"
+    gethomepage.dev/name: "Cartes 113"
+    gethomepage.dev/description: "API Symfony / API Platform"
+    gethomepage.dev/group: "Apps"
+    gethomepage.dev/icon: "symfony"
+    gethomepage.dev/href: "https://fs-cartes113.forelse.info/docs"
+    gethomepage.dev/pod-selector: "app=app"
+
+spec:
+  ingressClassName: traefik
+  rules:
+    - host: fs-cartes113.forelse.info
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: app
+                port:
+                  name: http
+  tls:
+    - hosts:
+        - fs-cartes113.forelse.info
+      # Pas de secretName : Traefik gère le cert via ACME (acme.json)

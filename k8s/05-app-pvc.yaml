@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mercure-data
+  namespace: cartes113
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  # Adapter selon ton StorageClass disponible (kubectl get storageclass)
+  # storageClassName: local-path

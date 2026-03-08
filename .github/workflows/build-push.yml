@@ -7,7 +7,6 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  REPO: ${{ github.repository }}
 
 jobs:
   build-push:
@@ -19,6 +18,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Set lowercase image name
+        id: image
+        run: echo "repo=$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_OUTPUT
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -36,7 +39,7 @@ jobs:
           context: .
           target: app_php
           push: true
-          tags: ${{ env.REGISTRY }}/${{ env.REPO }}-php:latest
+          tags: ${{ env.REGISTRY }}/${{ steps.image.outputs.repo }}-php:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -46,6 +49,6 @@ jobs:
           context: .
           target: app_caddy
           push: true
-          tags: ${{ env.REGISTRY }}/${{ env.REPO }}-caddy:latest
+          tags: ${{ env.REGISTRY }}/${{ steps.image.outputs.repo }}-caddy:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max

@@ -21,10 +21,8 @@ log
 route {
     root * /srv/app/public
     mercure {
-        # Transport bolt (nouvelle syntaxe — transport_url est déprécié)
-        transport bolt {
-            path /data/mercure.db
-        }
+        # Transport bolt (path en argument inline)
+        transport bolt /data/mercure.db
         # Publisher JWT key
         publisher_jwt {env.MERCURE_PUBLISHER_JWT_KEY} {env.MERCURE_PUBLISHER_JWT_ALG}
         # Subscriber JWT key

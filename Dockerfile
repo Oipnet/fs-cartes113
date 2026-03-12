@@ -76,6 +76,9 @@ RUN set -eux; \
 	composer run-script --no-dev post-install-cmd; \
 	chmod +x bin/console; sync
 
+# Permissions pour www-data (UID 33) — nécessaire pour tourner en non-root
+RUN chown -R www-data:www-data var/ /var/run/php
+
 # Dev image
 FROM app_php AS app_php_dev
 

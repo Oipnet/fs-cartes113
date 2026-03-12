@@ -7,8 +7,12 @@ if [ "${1#-}" != "$1" ]; then
 fi
 
 if [ "$1" = 'php-fpm' ] || [ "$1" = 'php' ] || [ "$1" = 'bin/console' ]; then
-	setfacl -R -m u:www-data:rwX -m u:"$(whoami)":rwX var || true
-	setfacl -dR -m u:www-data:rwX -m u:"$(whoami)":rwX var || true
+	# setfacl only needed when running as root to grant www-data access
+	# Skipped when already running as www-data (non-root) or on NFS (ACL not supported)
+	if [ "$(id -u)" = "0" ]; then
+		setfacl -R -m u:www-data:rwX -m u:"$(whoami)":rwX var || true
+		setfacl -dR -m u:www-data:rwX -m u:"$(whoami)":rwX var || true
+	fi
 
 	if [ "$APP_ENV" != 'prod' ]; then
 		composer install --prefer-dist --no-progress --no-interaction

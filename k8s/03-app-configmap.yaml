@@ -10,15 +10,6 @@ data:
   TRUSTED_HOSTS: "^fs-cartes113\\.forelse\\.info$"
   CORS_ALLOW_ORIGIN: "^https://fs-cartes113\\.forelse\\.info$"
 
-  # Mercure
-  # URL interne : PHP → Caddy via localhost (même pod)
-  MERCURE_URL: "http://localhost/.well-known/mercure"
-  # URL publique : utilisée par le navigateur client
-  MERCURE_PUBLIC_URL: "https://fs-cartes113.forelse.info/.well-known/mercure"
-  MERCURE_PUBLISHER_JWT_ALG: "HS256"
-  MERCURE_SUBSCRIBER_JWT_ALG: "HS256"
-  MERCURE_EXTRA_DIRECTIVES: ""
-
   # Caddy
   # :80 → Traefik gère le TLS, Caddy sert en HTTP
   SERVER_NAME: ":80"

@@ -93,18 +93,10 @@ RUN set -eux; \
 
 RUN rm -f .env.local.php
 
-# Build Caddy with the Mercure and Vulcain modules
-FROM caddy:2-builder-alpine AS app_caddy_builder
-
-RUN xcaddy build \
-	--with github.com/dunglas/mercure/caddy@v0.15.3 \
-	--with github.com/dunglas/vulcain/caddy
-
-# Caddy image
+# Caddy image (standard, sans modules custom)
 FROM caddy:2-alpine AS app_caddy
 
 WORKDIR /srv/app
 
-COPY --from=app_caddy_builder --link /usr/bin/caddy /usr/bin/caddy
 COPY --from=app_php --link /srv/app/public public/
 COPY --link docker/caddy/Caddyfile /etc/caddy/Caddyfile

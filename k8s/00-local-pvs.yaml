@@ -1,0 +1,59 @@
+# PersistentVolumes statiques pour la StorageClass "local-storage" (no-provisioner)
+# Les répertoires doivent exister sur le node AVANT d'appliquer :
+#   ssh root@51.158.107.191 "mkdir -p /data/k8s/postgres /data/k8s/mercure /data/k8s/app-data"
+#
+# Adapter "worker-1" avec le vrai nom retourné par : kubectl get nodes
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: postgres-data
+spec:
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: local-storage
+  local:
+    path: /data/k8s/postgres
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: kubernetes.io/hostname
+              operator: In
+              values:
+                - worker-1  # ← vérifier avec kubectl get nodes
+  # Liaison explicite avec le PVC créé par le StatefulSet
+  claimRef:
+    namespace: cartes113
+    name: postgres-data-postgres-0
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: mercure-data
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: local-storage
+  local:
+    path: /data/k8s/mercure
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: kubernetes.io/hostname
+              operator: In
+              values:
+                - worker-1  # ← même node que postgres pour colocalisations cohérentes
+  claimRef:
+    namespace: cartes113
+    name: mercure-data
+

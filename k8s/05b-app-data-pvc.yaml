@@ -1,12 +1,13 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: mercure-data
+  name: app-data
   namespace: cartes113
 spec:
   accessModes:
-    - ReadWriteOnce
-  storageClassName: local-storage
+    - ReadWriteMany
+  storageClassName: ""
+  volumeName: app-data
   resources:
     requests:
-      storage: 1Gi
+      storage: 10Gi

@@ -47,11 +47,10 @@ spec:
         name: postgres-data
       spec:
         accessModes: ["ReadWriteOnce"]
+        storageClassName: local-storage
         resources:
           requests:
             storage: 5Gi
-        # Adapter selon ton StorageClass disponible (kubectl get storageclass)
-        # storageClassName: local-path
 ---
 apiVersion: v1
 kind: Service
